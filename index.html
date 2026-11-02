@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Office Mastery Path</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+/* Plan: ink-blue school notebook + marigold highlights. Display: Bricolage Grotesque; body: Atkinson Hyperlegible (built for easy reading).
+   Layout: sticky track bar on top, one view per track (hash routed), lessons as expandable cards grouped by level. */
+:root{
+  --ink:#1d2a4d;          /* main text, ink blue */
+  --paper:#f6f7fb;        /* page background */
+  --card:#ffffff;
+  --rule:#d9deea;         /* notebook rule lines */
+  --muted:#59627a;
+  --marigold:#e8a317;     /* accent */
+  --marigold-soft:#fff3d6;
+  --accent-ink:#2f4bb3;   /* links */
+  --ok:#1f8a4c;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --c-found:#5b6478; --c-excel:#1b7a46; --c-word:#2b5bb8; --c-ppt:#c4502b; --c-outlook:#0f6fae; --c-onenote:#7a3fa6;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ink:#e6e9f3; --paper:#11162a; --card:#1a2038; --rule:#2c3454; --muted:#a3abc3;
+    --marigold:#f2b740; --marigold-soft:#3a3019; --accent-ink:#9db2ff; --ok:#5cc98a;
+    --c-found:#9aa3b8; --c-excel:#4cc483; --c-word:#7fa6f0; --c-ppt:#f0866a; --c-outlook:#5fb3ea; --c-onenote:#c08ae6;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#e6e9f3; --paper:#11162a; --card:#1a2038; --rule:#2c3454; --muted:#a3abc3;
+  --marigold:#f2b740; --marigold-soft:#3a3019; --accent-ink:#9db2ff; --ok:#5cc98a;
+  --c-found:#9aa3b8; --c-excel:#4cc483; --c-word:#7fa6f0; --c-ppt:#f0866a; --c-outlook:#5fb3ea; --c-onenote:#c08ae6;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.6}
+a{color:var(--accent-ink)}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid var(--marigold);outline-offset:2px;border-radius:6px}
+h1,h2,h3,h4{font-family:var(--display);line-height:1.2;text-wrap:balance;margin:0}
+h1{font-size:clamp(30px,5vw,46px);font-weight:800}
+h2{font-size:clamp(24px,3.4vw,32px);font-weight:800}
+h3{font-size:21px;font-weight:600}
+p{margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding:0 18px}
+
+/* Top bar */
+header.top{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--rule)}
+.topin{display:flex;align-items:center;gap:14px;padding:10px 18px;max-width:1080px;margin:0 auto;flex-wrap:wrap}
+.brand{font-family:var(--display);font-weight:800;font-size:20px;text-decoration:none;color:var(--ink);display:flex;align-items:center;gap:8px}
+.brand i{display:inline-block;width:14px;height:14px;border-radius:3px;background:var(--marigold);transform:rotate(45deg)}
+nav.tracks{display:flex;gap:6px;overflow-x:auto;flex:1;padding-bottom:2px}
+nav.tracks a{white-space:nowrap;text-decoration:none;color:var(--ink);font-size:15px;padding:6px 12px;border-radius:999px;border:1px solid var(--rule);display:flex;align-items:center;gap:6px}
+nav.tracks a .dot{width:9px;height:9px;border-radius:50%}
+nav.tracks a[aria-current="page"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+main{padding:28px 0 60px}
+section.view{display:none}
+section.view.on{display:block}
+.stack{display:flex;flex-direction:column;gap:28px}
+
+/* Home */
+.hero{display:grid;grid-template-columns:1.4fr 1fr;gap:28px;align-items:start}
+.hero p.lead{font-size:20px;color:var(--muted);margin-top:12px;max-width:60ch}
+.note{background:var(--marigold-soft);border-left:5px solid var(--marigold);padding:16px 18px;border-radius:8px}
+.note h3{font-size:18px;margin-bottom:6px}
+.method{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.method div{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:14px}
+.method b{font-family:var(--display);display:block;font-size:17px}
+.method span{font-size:15px;color:var(--muted)}
+.method em{font-style:normal;font-family:var(--display);color:var(--marigold);font-weight:800;font-size:22px}
+
+.roadmap{overflow-x:auto;border:1px solid var(--rule);border-radius:12px;background:var(--card)}
+.roadmap table{border-collapse:collapse;width:100%;min-width:820px;font-size:15px}
+.roadmap th,.roadmap td{border-bottom:1px solid var(--rule);padding:10px 12px;vertical-align:top;text-align:left}
+.roadmap thead th{font-family:var(--display);font-size:16px;background:var(--paper)}
+.roadmap thead th small{display:block;font-family:var(--body);font-weight:400;color:var(--muted);font-size:13px}
+.roadmap tbody th{white-space:nowrap;font-family:var(--display)}
+.roadmap td a{display:block;text-decoration:none;color:var(--ink);padding:2px 0}
+.roadmap td a:hover{color:var(--accent-ink);text-decoration:underline}
+.roadmap td a.done::before{content:"✓ ";color:var(--ok);font-weight:700}
+
+.progress-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.ptile{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:14px;text-decoration:none;color:var(--ink);display:flex;flex-direction:column;gap:8px}
+.ptile b{font-family:var(--display);font-size:18px}
+.bar{height:8px;background:var(--rule);border-radius:99px;overflow:hidden}
+.bar span{display:block;height:100%;background:var(--track,var(--marigold));border-radius:99px;transition:width .3s}
+.ptile small{color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* Track view */
+.trackhead{border-top:8px solid var(--track);background:var(--card);border-radius:12px;padding:22px;border-left:1px solid var(--rule);border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);display:flex;flex-direction:column;gap:12px}
+.trackhead .why{color:var(--muted);max-width:70ch}
+.trackhead .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:14px;padding:4px 10px;border-radius:99px;border:1px solid var(--rule);background:var(--paper);text-decoration:none;color:var(--ink)}
+.level{display:flex;flex-direction:column;gap:12px}
+.levelhead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-bottom:2px solid var(--rule);padding-bottom:8px}
+.levelhead .tag{font-size:13px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;color:var(--track)}
+.levelhead p{color:var(--muted);font-size:16px;flex-basis:100%}
+
+details.lesson{background:var(--card);border:1px solid var(--rule);border-left:5px solid var(--track);border-radius:10px}
+details.lesson[open]{box-shadow:0 2px 14px rgba(20,30,60,.08)}
+details.lesson summary{cursor:pointer;list-style:none;padding:14px 18px;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:start}
+details.lesson summary::-webkit-details-marker{display:none}
+.num{font-family:var(--display);font-weight:800;color:var(--track);font-size:18px;min-width:2.2em;font-variant-numeric:tabular-nums}
+.sumtext b{font-family:var(--display);font-size:19px;display:block}
+.sumtext span{color:var(--muted);font-size:16px}
+.state{font-size:13px;padding:3px 9px;border-radius:99px;border:1px solid var(--rule);white-space:nowrap;color:var(--muted)}
+.state.done{background:var(--ok);color:#fff;border-color:var(--ok)}
+.chev{transition:transform .2s}
+details[open] .chev{transform:rotate(90deg)}
+.lbody{padding:0 18px 18px 18px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.lbody .full{grid-column:1/-1}
+.box{border-radius:8px;padding:14px 16px;background:var(--paper);border:1px solid var(--rule)}
+.box h4{font-size:15px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:6px;font-family:var(--body);font-weight:700}
+.box.analogy{background:var(--marigold-soft);border-color:transparent}
+.box ol,.box ul{margin:0;padding-left:1.3em}
+.box li{margin:4px 0}
+kbd{font-family:ui-monospace,Consolas,monospace;font-size:.85em;background:var(--card);border:1px solid var(--rule);border-bottom-width:2px;border-radius:5px;padding:0 5px}
+code{font-family:ui-monospace,Consolas,monospace;font-size:.88em;background:var(--card);border:1px solid var(--rule);border-radius:5px;padding:1px 5px;word-break:break-word}
+.res{list-style:none;padding:0!important;display:flex;flex-direction:column;gap:6px}
+.res li{display:flex;gap:8px;align-items:baseline}
+.rtype{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:1px 7px;border-radius:5px;background:var(--card);border:1px solid var(--rule);color:var(--muted);flex:none;min-width:64px;text-align:center}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+button.mark{font:inherit;font-size:16px;padding:8px 16px;border-radius:8px;border:2px solid var(--ok);background:transparent;color:var(--ok);cursor:pointer;font-weight:700}
+button.mark.done{background:var(--ok);color:#fff}
+.nexttrack{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.nexttrack a{font-family:var(--display);font-size:18px;text-decoration:none;padding:12px 18px;border:1px solid var(--rule);border-radius:10px;background:var(--card)}
+
+/* Projects / resources */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.card h3{font-size:19px}
+.card ul{margin:0;padding-left:1.2em;font-size:16px}
+.card .stage{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--marigold);font-weight:700}
+.reslist{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.reslist .card li{margin:6px 0}
+.reslist .card small{display:block;color:var(--muted);font-size:14px}
+.glossary{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.glossary div{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:12px 14px}
+.glossary b{font-family:var(--display)}
+.glossary span{display:block;color:var(--muted);font-size:16px}
+.searchrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.searchrow input{font:inherit;font-size:17px;padding:10px 14px;border-radius:10px;border:1px solid var(--rule);background:var(--card);color:var(--ink);flex:1;min-width:220px}
+#searchResults{display:flex;flex-direction:column;gap:6px}
+#searchResults a{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:8px 12px;text-decoration:none;color:var(--ink)}
+#searchResults a small{color:var(--muted);display:block}
+footer{border-top:1px solid var(--rule);padding:22px 0;color:var(--muted);font-size:15px}
+
+@media (max-width:860px){
+  .hero{grid-template-columns:1fr}
+  .method{grid-template-columns:repeat(2,1fr)}
+  .progress-grid,.cards{grid-template-columns:1fr 1fr}
+  .lbody{grid-template-columns:1fr}
+  .reslist,.glossary{grid-template-columns:1fr}
+}
+@media (max-width:480px){
+  body{font-size:17px}
+  .method,.progress-grid,.cards{grid-template-columns:1fr}
+  details.lesson summary{grid-template-columns:auto 1fr}
+  details.lesson summary .state{grid-column:2;justify-self:start}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="topin">
+    <a class="brand" href="#home"><i></i>Office Mastery Path</a>
+    <nav class="tracks" id="tracknav" aria-label="Course sections"></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- HOME -->
+  <section class="view stack" id="v-home">
+    <div class="hero">
+      <div>
+        <h1>Learn Microsoft Office from first click to confident expert</h1>
+        <p class="lead">A step-by-step course in Excel, Word, PowerPoint, Outlook and OneNote, written for a teacher. Every lesson has a real-life analogy, clear steps, a small task to try, tips, and hand-picked videos and articles.</p>
+      </div>
+      <div class="note">
+        <h3>Start here</h3>
+        <p>Begin with <a href="#foundations">Foundations</a> (four short lessons). Then follow the roadmap below one column at a time: finish all <b>Beginner</b> lessons, then <b>Intermediate</b>, then <b>Advanced</b>. Plan on <b>2 hours a day</b> to finish the whole path in <b>about 45 days</b>: Stage 1 in days 1–14, Stage 2 in days 15–30, Stage 3 in days 31–45. A good split for each session: 30 minutes watching and reading, 1 hour doing the “Try it” task, 30 minutes on teach-back and review.</p>
+      </div>
+    </div>
+
+    <div class="stack" style="gap:12px">
+      <h2>How to study each lesson</h2>
+      <div class="method">
+        <div><em>1</em><b>Read</b><span>Read the analogy and the goal first, so you know why it matters.</span></div>
+        <div><em>2</em><b>Watch</b><span>Open the video link. Pause and copy each click on your own screen.</span></div>
+        <div><em>3</em><b>Do</b><span>Complete the “Try it” task with your own students’ or family data.</span></div>
+        <div><em>4</em><b>Teach back</b><span>Explain it aloud in 2 minutes, as if to a student. Record it on your phone if you like.</span></div>
+        <div><em>5</em><b>Tick</b><span>Press “Mark as done”. Your progress is saved in this browser.</span></div>
+      </div>
+    </div>
+
+    <div class="stack" style="gap:12px">
+      <h2>Your progress</h2>
+      <div class="progress-grid" id="progressGrid"></div>
+    </div>
+
+    <div class="stack" style="gap:12px">
+      <h2>The roadmap</h2>
+      <p style="color:var(--muted)">Each column is a stage. Work down a column across all apps before moving right, so the skills support each other (for example, Excel lists feed Word mail merge).</p>
+      <div class="roadmap"><table id="roadmapTable"></table></div>
+    </div>
+
+    <div class="stack" style="gap:12px">
+      <h2>Find a lesson</h2>
+      <div class="searchrow">
+        <label for="q" style="font-weight:700">Search</label>
+        <input id="q" type="search" placeholder="Try: mail merge, pivot, signature, certificate…">
+      </div>
+      <div id="searchResults"></div>
+    </div>
+  </section>
+
+  <!-- TRACK VIEWS are generated -->
+  <div id="trackViews"></div>
+
+  <!-- PROJECTS -->
+  <section class="view stack" id="v-projects">
+    <div class="trackhead" style="--track:var(--marigold)">
+      <h1>Practice projects</h1>
+      <p class="why">One project closes each stage. Each uses all five apps together on work you already do as a teacher and tutor, so the skills stick and you finish with a ready-to-use toolkit and a portfolio to show.</p>
+    </div>
+    <div class="cards" id="projectCards"></div>
+    <div class="stack" style="gap:12px">
+      <h2>After the course: turning skills into work</h2>
+      <div class="cards">
+        <div class="card"><span class="stage">Certify</span><h3>Microsoft Office Specialist (MOS)</h3><p>An internationally recognised exam per app (Word, Excel, PowerPoint, Outlook), with Associate and Expert levels. Exam centres operate across India, including Hyderabad.</p><a href="https://certiport.pearsonvue.com/Certifications/Microsoft/MOS/Overview">MOS overview (Certiport)</a></div>
+        <div class="card"><span class="stage">Teach</span><h3>Teach Office to others</h3><p>With an M.Ed. and tuition experience you can teach computer basics and Office to school children, homemakers and seniors, online or in person. Hindi, Urdu or Telugu explanations are in demand.</p><a href="#projects">Use your Stage 3 video lesson as a sample</a></div>
+        <div class="card"><span class="stage">Create</span><h3>Restart the YouTube channel</h3><p>Short “one skill in 5 minutes” Office videos made with PowerPoint’s recording feature. Each lesson in this course is a ready topic for a video.</p><a href="#powerpoint">See PowerPoint Advanced lesson on video export</a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESOURCES -->
+  <section class="view stack" id="v-resources">
+    <div class="trackhead" style="--track:var(--marigold)">
+      <h1>Library of resources</h1>
+      <p class="why">The best free places to learn, grouped by kind. Start with the official Microsoft material; use the YouTube channels when you prefer watching; use the blogs when you want deeper tricks.</p>
+    </div>
+    <div class="reslist" id="resLibrary"></div>
+  </section>
+
+  <!-- GLOSSARY -->
+  <section class="view stack" id="v-glossary">
+    <div class="trackhead" style="--track:var(--marigold)">
+      <h1>Glossary in plain words</h1>
+      <p class="why">Words you will hear in videos and articles, explained the way you would explain them to a student.</p>
+    </div>
+    <div class="glossary" id="glossaryList"></div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">Made for a lifelong teacher starting a new chapter. Menus and button names follow Microsoft 365 (the current subscription version and the free web apps at office.com). Older versions such as Office 2016 may place a few commands differently; use the Search box at the top of any app to find them.</div>
+</footer>
+
+<script>
+const yt = q => "https://www.youtube.com/results?search_query=" + encodeURIComponent(q);
+const MS_TRAIN = "https://support.microsoft.com/en-us/training";
+const SUP = a => "https://support.microsoft.com/en-us/" + a;
+const GCF = a => "https://edu.gcfglobal.org/en/" + a + "/";
+
+/* Each lesson: [title, goal, analogy, steps[], tryIt, tips[], resources[[type,label,url]]] */
+const TRACKS = [
+ {id:"foundations", name:"Foundations", color:"--c-found",
+  why:"Before the apps: getting Office, saving files where you can find them, and the handful of controls that work the same in every Office program. Learn these once and every later lesson becomes easier.",
+  hindi:"Microsoft Office basics in Hindi for beginners",
+  levels:{
+  beginner:[
+   ["Get Microsoft Office (free options first)","Open all five apps on your laptop or in a browser.",
+    "A Microsoft account is like a library card: one card opens every room of the library (Word, Excel, PowerPoint, Outlook, OneNote and 5 GB of OneDrive storage).",
+    ["Go to <b>office.com</b> in Chrome or Edge.","Click <b>Sign in</b>. If you have no account, choose <b>Create one</b>; a free outlook.com email address works.","After signing in, the app icons appear on the left side. Click <b>Word</b> to open the free web version.","The free web apps cover almost all Beginner and Intermediate lessons here. Some Advanced features (Power Query, mail merge, macros) need the desktop apps that come with a Microsoft 365 Personal or Family subscription.","If you buy a subscription, return to office.com and choose <b>Install apps</b>."],
+    "Open Word on office.com, type one line about yourself, and rename the document (click the name at the top) to <code>My first document</code>.",
+    ["Check the current Microsoft 365 price in India on microsoft.com before buying; there are often family plans for up to 6 people.","Anyone with an active school or college email may get Office free through Office 365 Education."],
+    [["Docs","Free Microsoft 365 on the web","https://www.microsoft.com/en-us/microsoft-365/free-office-online-for-the-web"],["Docs","Office 365 Education (free for eligible schools)","https://www.microsoft.com/en-us/education/products/office"],["Video","Microsoft 365 for beginners (Kevin Stratvert)",yt("Kevin Stratvert Microsoft 365 beginners tutorial")]]],
+   ["Files, folders and OneDrive","Save your work so you can always find it again, on any device.",
+    "OneDrive is your steel almirah in the cloud. Folders are its shelves, and each file is one register on a shelf. If you label the shelves well, you never search for long.",
+    ["Press <kbd>Windows</kbd> + <kbd>E</kbd> to open File Explorer.","Click <b>OneDrive</b> on the left, then right-click an empty area and choose <b>New &gt; Folder</b>. Name it <code>Office Learning</code>.","Inside it, create one folder per app: Word, Excel, PowerPoint, Outlook, OneNote.","In any app, use <b>File &gt; Save As</b> and choose a OneDrive folder. The <b>AutoSave</b> switch at the top-left then turns on and saves every few seconds.","To reopen work, use <b>File &gt; Open &gt; Recent</b>."],
+    "Create the folder structure above and save your “My first document” into the Word folder.",
+    ["Name files with the date first, year-month-day, so they sort in order: <code>2026-11 Class7 Marks.xlsx</code>.","Avoid names like “final final 2”. Use v1, v2 if you need versions; OneDrive also keeps Version History."],
+    [["Course","Windows Basics (GCFGlobal, free)",GCF("windowsbasics")],["Docs","OneDrive help and learning",SUP("onedrive")],["Video","OneDrive tutorial for beginners",yt("OneDrive tutorial for beginners Kevin Stratvert")]]],
+   ["The Ribbon, the Search box and Undo","Find any command without memorising menus.",
+    "The Ribbon is a well-organised kitchen. The Home tab is the everyday spice box (bold, colours, copy). Insert is where you bring something new in (pictures, tables). Every Office app uses the same kitchen layout, so learning it once pays five times.",
+    ["Look at the top of Word: the words Home, Insert, Design, Layout… are <b>tabs</b>.","Each tab holds <b>groups</b> (for example, Font, Paragraph) and each group holds <b>commands</b> (buttons).","Hover over any button for 2 seconds; a tooltip explains what it does.","Not sure where something lives? Click the <b>Search</b> box at the very top (or press <kbd>Alt</kbd> + <kbd>Q</kbd>) and type what you want, such as “page border”.","Made a mistake? Press <kbd>Ctrl</kbd> + <kbd>Z</kbd> (Undo). Press it again to go further back."],
+    "Using only the Search box, find and add a page border to your Word document, then undo it.",
+    ["You cannot break the computer by clicking around. Undo fixes nearly everything.","Right-click is a shortcut menu: it shows the most useful commands for whatever you clicked."],
+    [["Docs","Microsoft 365 Training Center",MS_TRAIN],["Course","Office basics (GCFGlobal)",GCF("officebasics")],["Video","Understanding the Ribbon",yt("Microsoft Office ribbon explained beginners")]]],
+   ["Ten keyboard shortcuts that work everywhere","Work faster and with less strain on your wrist.",
+    "Shortcuts are like knowing the short lane in Hyderabad traffic: you reach the same place, in half the time.",
+    ["<kbd>Ctrl</kbd>+<kbd>C</kbd> copy, <kbd>Ctrl</kbd>+<kbd>X</kbd> cut, <kbd>Ctrl</kbd>+<kbd>V</kbd> paste.","<kbd>Ctrl</kbd>+<kbd>Z</kbd> undo, <kbd>Ctrl</kbd>+<kbd>Y</kbd> redo.","<kbd>Ctrl</kbd>+<kbd>S</kbd> save, <kbd>Ctrl</kbd>+<kbd>P</kbd> print.","<kbd>Ctrl</kbd>+<kbd>F</kbd> find, <kbd>Ctrl</kbd>+<kbd>A</kbd> select all, <kbd>Ctrl</kbd>+<kbd>B</kbd> bold.","<kbd>Alt</kbd>+<kbd>Tab</kbd> switches between open windows. <kbd>Windows</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> takes a screenshot of part of the screen."],
+    "Write the ten shortcuts on a sticky note beside your screen. For one week, use them instead of the mouse.",
+    ["On a Mac, use <kbd>Cmd</kbd> in place of <kbd>Ctrl</kbd>.","10 minutes of daily typing practice for two weeks makes every later lesson faster."],
+    [["Practice","Free typing practice (Keybr)","https://www.keybr.com/"],["Practice","Typing lessons (Typing.com)","https://www.typing.com/"],["Video","Keyboard shortcuts everyone should know",yt("keyboard shortcuts everyone should know Windows")]]]
+  ]}},
+
+ {id:"excel", name:"Excel", color:"--c-excel",
+  why:"Excel is the most valued Office skill in jobs. For you, it replaces the paper register: marks, attendance, tuition fees and household budgets, with totals that calculate themselves and charts that explain results to parents.",
+  hindi:"Excel tutorial in Hindi beginner to advanced",
+  levels:{
+  beginner:[
+   ["Cells, rows, columns and sheets","Understand the Excel grid and enter a simple list.",
+    "Excel is an attendance register with endless pages. Rows run across (one per student), columns run down (one per subject or date). Each box is a <b>cell</b> with an address, like a cinema seat: <code>B3</code> means column B, row 3.",
+    ["Open Excel and choose <b>Blank workbook</b>.","Click cell <code>A1</code>, type <code>Name</code>, then press <kbd>Tab</kbd> to move right and type <code>Maths</code>, <code>English</code>, <code>Science</code>.","Press <kbd>Enter</kbd> to go down and type five student names in column A, with marks beside them.","Double-click the line between column letters A and B to make column A fit the names.","Double-click the tab <code>Sheet1</code> at the bottom and rename it <code>Class 7</code>. Save to your Excel folder."],
+    "Make a sheet of 5 students with marks in 3 subjects. Keep it; the next three lessons build on it.",
+    ["<kbd>Tab</kbd> moves right, <kbd>Enter</kbd> moves down, <kbd>Ctrl</kbd>+<kbd>Home</kbd> jumps back to A1.","One topic per sheet, one fact per cell: put first name and last name in separate columns if you will ever sort by them."],
+    [["Course","Excel tutorial (GCFGlobal, free)",GCF("excel")],["Docs","Excel help and learning (Microsoft)",SUP("excel")],["Video","Excel for beginners (Kevin Stratvert)",yt("Kevin Stratvert Excel for beginners")]]],
+   ["Make it readable: formatting","Turn a plain grid into a sheet anyone can read at a glance.",
+    "Formatting is neat handwriting on the blackboard: the content is the same, but students understand it faster.",
+    ["Select row 1 by clicking the number <b>1</b>, then press <kbd>Ctrl</kbd>+<kbd>B</kbd> and pick a fill colour from <b>Home &gt; Fill Color</b>.","Select your table and choose <b>Home &gt; Borders &gt; All Borders</b>.","For fees, select the cells and choose <b>Home &gt; Number Format &gt; More Number Formats &gt; Currency</b>, then pick the ₹ symbol (English (India)).","For dates, choose <b>Short Date</b>. Type dates as <code>02/11/2026</code> or <code>2-Nov-2026</code>.","Choose <b>View &gt; Freeze Panes &gt; Freeze Top Row</b> so headings stay visible while you scroll."],
+    "Add a <code>Fee</code> column to your sheet, format it as ₹, and freeze the heading row.",
+    ["Use <b>Home &gt; Format Painter</b> (the paintbrush) to copy formatting from one cell to others.","Keep to two or three colours; too many colours hide the important numbers."],
+    [["Course","Formatting cells (GCFGlobal)",GCF("excel/formatting-cells/1")],["Video","Excel formatting basics",yt("Excel formatting basics beginners number format borders")],["Blog","Exceljet: Excel shortcuts list","https://exceljet.net/shortcuts"]]],
+   ["Your first formulas: SUM, AVERAGE, MIN, MAX","Let Excel do the totals, so they update when marks change.",
+    "A formula is a calculator that remembers. Correct one mark and the total corrects itself, like an answer key that rewrites its own answers.",
+    ["Every formula starts with <code>=</code>. In <code>E1</code> type <code>Total</code>.","In <code>E2</code> type <code>=SUM(B2:D2)</code> and press <kbd>Enter</kbd>. <code>B2:D2</code> means “from B2 to D2”.","Click <code>E2</code>, then drag the small square at its bottom-right corner (the <b>fill handle</b>) down to the last student. Excel copies the formula for each row.","In <code>F2</code> type <code>=AVERAGE(B2:D2)</code> and fill down.","Under each subject, try <code>=MAX(B2:B6)</code> and <code>=MIN(B2:B6)</code> for the highest and lowest marks."],
+    "Add Total and Average columns, plus a row showing the class topper’s marks in each subject.",
+    ["<kbd>Alt</kbd>+<kbd>=</kbd> is AutoSum: it guesses the range and writes =SUM for you.","Basic maths works too: <code>=B2*2</code>, <code>=E2/300*100</code> for a percentage."],
+    [["Course","Intro to formulas (GCFGlobal)",GCF("excel/intro-to-formulas/1")],["Docs","Overview of formulas in Excel",SUP("excel")],["Video","SUM, AVERAGE, MIN, MAX explained",yt("Excel SUM AVERAGE MIN MAX beginners tutorial")]]],
+   ["Sort, filter and your first chart","Find answers in your list and show results visually.",
+    "Sorting is lining students up by height; filtering is asking only the girls’ team to stand up; a chart is the photo that shows it all at once.",
+    ["Click any cell in your list and press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd> to add filter arrows to the headings.","Click the arrow on <code>Total</code> and choose <b>Sort Largest to Smallest</b> to rank students.","Click the arrow on a column and untick values to show only some rows. Choose <b>Clear Filter</b> to see all again.","Select the names and the Total column (hold <kbd>Ctrl</kbd> to select both), then <b>Insert &gt; Recommended Charts</b> and pick a column chart.","Click the chart title to rename it, for example <code>Class 7 Term 1 Totals</code>."],
+    "Rank your students and create a column chart of totals you could show at a parents’ meeting.",
+    ["Always select the whole list before sorting, or the names will separate from their marks. Filter arrows avoid this problem.","Column charts compare items; line charts show change over time (monthly fees)."],
+    [["Course","Sorting and filtering data (GCFGlobal)",GCF("excel/sorting-data/1")],["Video","Excel charts for beginners",yt("Excel charts for beginners recommended charts")],["Blog","Exceljet: chart tips","https://exceljet.net/chart-types"]]]
+  ],
+  intermediate:[
+   ["Relative and absolute references ($)","Copy formulas without them breaking.",
+    "A relative reference is like saying “the student sitting to my left”: it changes as you move seats. An absolute reference (<code>$G$1</code>) is like “the Principal’s office”: the same place wherever you stand.",
+    ["Type the maximum marks <code>300</code> in <code>G1</code>.","In <code>F2</code> type <code>=E2/G1</code> and fill down. Rows below show errors, because G1 slides to G2, G3…","Fix it: in <code>F2</code> type <code>=E2/$G$1</code>. The dollar signs lock the cell.","Quick way: click into the formula on G1 and press <kbd>F4</kbd> to add the dollar signs.","Format column F as a percentage with <b>Home &gt; %</b>."],
+    "Add a Percentage column to your marks sheet using an absolute reference to the maximum marks.",
+    ["Press <kbd>F4</kbd> repeatedly to cycle: $G$1 → G$1 → $G1 → G1.","Put fixed values (max marks, fee per month, tax rate) in one labelled cell instead of typing them into formulas."],
+    [["Course","Relative and absolute references (GCFGlobal)",GCF("excel/relative-and-absolute-cell-references/1")],["Video","Absolute references explained (Leila Gharani)",yt("Leila Gharani absolute relative references")],["Blog","Exceljet: absolute reference","https://exceljet.net/glossary/absolute-reference"]]],
+   ["Decisions: IF, IFS, COUNTIF, SUMIF","Have Excel judge pass/fail, assign grades, and count or add by condition.",
+    "IF is your classroom rule: “IF homework is done, give a star, otherwise a reminder.” COUNTIF is counting raised hands only for those who answered “yes”.",
+    ["Pass or fail: <code>=IF(F2&gt;=35%,\"Pass\",\"Fail\")</code>.","Grades with IFS: <code>=IFS(F2&gt;=90%,\"A+\",F2&gt;=75%,\"A\",F2&gt;=60%,\"B\",F2&gt;=35%,\"C\",TRUE,\"Needs support\")</code>.","How many passed: <code>=COUNTIF(H2:H31,\"Pass\")</code>.","Fees collected from one student: <code>=SUMIF(A:A,\"Ayesha\",C:C)</code> where column A has names and C has amounts.","Average of only Class 7 students: <code>=AVERAGEIF(B:B,\"7\",E:E)</code>."],
+    "Add Result and Grade columns, and a small summary box: number passed, number failed, and class average.",
+    ["Text in formulas goes inside straight double quotes: <code>\"Pass\"</code>.","Read IF aloud as a sentence before typing it: if <i>this</i>, then <i>that</i>, otherwise <i>other</i>."],
+    [["Course","IF function (GCFGlobal)",GCF("excel/intro-to-functions/1")],["Blog","Exceljet: IF function","https://exceljet.net/functions/if-function"],["Video","IF, COUNTIF and SUMIF tutorial",yt("Excel IF COUNTIF SUMIF tutorial beginners")]]],
+   ["Tables, drop-downs and conditional formatting","Build a fee tracker that is tidy, grows by itself and highlights problems.",
+    "An Excel Table is a smart register: add a new student and the totals, colours and formulas extend automatically. Conditional formatting is the red ink that appears by itself when a fee is pending.",
+    ["Make columns: Student, Month, Amount, Status. Click inside and press <kbd>Ctrl</kbd>+<kbd>T</kbd>, tick <b>My table has headers</b>.","Select the Status column cells, then <b>Data &gt; Data Validation &gt; Allow: List</b>, Source: <code>Paid,Pending</code>. Now each cell has a drop-down.","With Status selected, choose <b>Home &gt; Conditional Formatting &gt; Highlight Cells Rules &gt; Text that Contains</b>, type <code>Pending</code>, choose Light Red Fill.","Tick <b>Table Design &gt; Total Row</b> to add an automatic total for Amount.","Type a new row under the table and watch it join the table automatically."],
+    "Build a 3-month tuition fee tracker for your students with Paid/Pending drop-downs and red highlights.",
+    ["Name your table in <b>Table Design &gt; Table Name</b> (for example, <code>Fees</code>); formulas become readable, like <code>=SUM(Fees[Amount])</code>.","Try <b>Conditional Formatting &gt; Data Bars</b> on marks for an instant visual."],
+    [["Docs","Overview of Excel tables",SUP("excel")],["Course","Conditional formatting (GCFGlobal)",GCF("excel/conditional-formatting/1")],["Video","Excel Tables in 10 minutes",yt("Excel tables tutorial Ctrl T why you should use")]]],
+   ["Look things up: XLOOKUP (and VLOOKUP)","Pull a student’s phone number, fee or grade from another list automatically.",
+    "XLOOKUP is like looking up a phone number in your contacts: you give a name, it finds the row and hands you the number.",
+    ["Keep a <code>Students</code> sheet with Name, Parent Phone, Class.","On another sheet, type a student name in <code>A2</code>.","In <code>B2</code> type <code>=XLOOKUP(A2,Students!A:A,Students!B:B,\"Not found\")</code>.","Read it as: find A2 in the names column, return the matching phone, and say “Not found” if missing.","Older Excel (2019 and earlier) lacks XLOOKUP; use <code>=VLOOKUP(A2,Students!A:C,2,FALSE)</code> instead."],
+    "Create a “Student card” sheet: type a name and see the phone, class and total marks appear.",
+    ["XLOOKUP is in Microsoft 365, Excel 2021 and later, and Excel on the web.","Spelling must match exactly; extra spaces cause “Not found”. <code>=TRIM(A2)</code> removes them."],
+    [["Blog","Exceljet: XLOOKUP function","https://exceljet.net/functions/xlookup-function"],["Video","XLOOKUP explained (Leila Gharani)",yt("Leila Gharani XLOOKUP")],["Course","VLOOKUP (GCFGlobal)",GCF("excel/how-to-use-vlookup/1")]]]
+  ],
+  advanced:[
+   ["PivotTables: summarise hundreds of rows in seconds","Answer “how much fee per month?” or “average marks per class?” without writing formulas.",
+    "A PivotTable is a sorting tray: tip in 500 fee receipts and it instantly piles them by month, by student, or by class, and adds each pile.",
+    ["Click inside your fee table, then <b>Insert &gt; PivotTable &gt; OK</b> (new sheet).","In the field list, drag <b>Month</b> to Rows and <b>Amount</b> to Values. You now see the total per month.","Drag <b>Status</b> to Columns to split Paid and Pending.","Click inside the pivot and choose <b>PivotTable Analyze &gt; Insert Slicer &gt; Student</b> for one-click filter buttons.","When data changes, right-click the pivot and choose <b>Refresh</b>."],
+    "Using a full year of fee entries (copy-paste to make sample rows), build a pivot of monthly income with a Student slicer.",
+    ["Your source data must be one clean list: one header row, no blank rows, no merged cells.","Right-click a value and choose <b>Show Values As &gt; % of Grand Total</b> to see shares."],
+    [["Course","Intro to PivotTables (GCFGlobal)",GCF("excel/intro-to-pivottables/1")],["Video","PivotTables for beginners (Leila Gharani)",yt("Leila Gharani pivot tables beginners")],["Blog","Exceljet: Pivot table guide","https://exceljet.net/articles/excel-pivot-tables"]]],
+   ["Dynamic arrays: FILTER, SORT, UNIQUE and text/date functions","Create live lists, such as “students with pending fees”, that update themselves.",
+    "A dynamic formula is a noticeboard that rewrites itself: whenever a fee is paid, that name disappears from the “pending” list without anyone erasing it.",
+    ["Pending list: <code>=FILTER(Fees[Student],Fees[Status]=\"Pending\",\"All paid\")</code>.","Ranked marks: <code>=SORT(A2:E31,5,-1)</code> sorts by the 5th column, largest first.","List of classes without repeats: <code>=UNIQUE(C2:C31)</code>.","Dates: <code>=TODAY()</code>, and <code>=EDATE(A2,1)</code> gives the same day next month (next fee due date).","Text: <code>=PROPER(A2)</code> fixes capitals; <code>=TEXTJOIN(\", \",TRUE,list)</code> joins names into one line for a WhatsApp message."],
+    "Make a “Reminders” sheet showing pending students and a one-line list you can copy into a message.",
+    ["These formulas “spill” into the cells below; keep that space empty or you get a #SPILL! error.","Available in Microsoft 365, Excel 2021+ and Excel on the web."],
+    [["Blog","Exceljet: Dynamic array formulas","https://exceljet.net/articles/dynamic-array-formulas-in-excel"],["Video","FILTER, SORT, UNIQUE tutorial",yt("Excel FILTER SORT UNIQUE dynamic arrays tutorial")],["Blog","Chandoo.org: Excel tips","https://chandoo.org/wp/"]]],
+   ["Dashboards and Power Query","Combine data from many files and present it on one clean page.",
+    "Power Query is a helper who collects every monthly register, cleans the spelling mistakes and stacks them into one book, and does it again next month with one click. A dashboard is the one-page report card for your whole tuition centre.",
+    ["Put monthly CSV or Excel files in one folder.","Desktop Excel: <b>Data &gt; Get Data &gt; From File &gt; From Folder</b>, choose the folder, then <b>Combine &amp; Transform</b>.","In the Power Query window, remove blank rows, fix column types (date, number), then <b>Close &amp; Load</b>.","Build 2–3 PivotTables and PivotCharts from the result on a sheet called <code>Dashboard</code>; add slicers and connect them to all pivots (<b>Slicer &gt; Report Connections</b>).","Next month, drop a new file into the folder and click <b>Data &gt; Refresh All</b>."],
+    "Build a one-page dashboard: monthly income chart, pending amount, and number of students per class.",
+    ["Hide gridlines (<b>View &gt; Gridlines</b>) on the dashboard sheet for a cleaner look.","Keep raw data, calculations and dashboard on separate sheets."],
+    [["Docs","Power Query in Excel (Microsoft)",SUP("excel")],["Video","Power Query for beginners",yt("Power Query Excel beginners combine files from folder")],["Video","Interactive Excel dashboard tutorial",yt("interactive Excel dashboard tutorial slicers pivot charts")],["Blog","MyOnlineTrainingHub: dashboards","https://www.myonlinetraininghub.com/"]]],
+   ["Automation: macros, LAMBDA and Copilot","Turn repeated chores into one click, and know where AI help fits.",
+    "A macro is a tape recorder: record your steps once (format, sort, print) and press play every week.",
+    ["Show the Developer tab: <b>File &gt; Options &gt; Customize Ribbon</b>, tick <b>Developer</b>.","<b>Developer &gt; Record Macro</b>, give it a name, do your steps, then <b>Stop Recording</b>.","Save as <b>Excel Macro-Enabled Workbook (.xlsm)</b>, otherwise the macro is lost.","Run it with <b>Developer &gt; Macros &gt; Run</b>, or add a button via <b>Insert &gt; Shapes</b> and right-click <b>Assign Macro</b>.","With an eligible Microsoft 365 plan, open <b>Copilot</b> on the Home tab and ask in plain words, for example “highlight students below 40% and add a grade column”. Always check its results."],
+    "Record a macro that formats a newly pasted marks list (headings bold, borders, sort by total).",
+    ["Only enable macros in files you created or trust; macros from strangers can be harmful.","<code>LET</code> and <code>LAMBDA</code> let you name parts of long formulas and create your own functions; explore them once comfortable."],
+    [["Docs","Automate tasks with the Macro Recorder",SUP("excel")],["Docs","Microsoft Copilot help",SUP("copilot")],["Video","Record your first macro",yt("Excel record macro beginners tutorial")],["Blog","Excel Campus (Jon Acampora)","https://www.excelcampus.com/"]]]
+  ]}},
+
+ {id:"word", name:"Word", color:"--c-word",
+  why:"You already write worksheets, letters and lesson plans. Word mastery makes them look professional, keeps long documents organised, and lets you produce 30 personalised certificates in minutes.",
+  hindi:"MS Word tutorial in Hindi complete",
+  levels:{
+  beginner:[
+   ["Typing, selecting and formatting text","Write, correct and style text confidently.",
+    "Word is a notebook with a perfect eraser: you can rewrite, move and decorate anything without leaving marks.",
+    ["Open Word, choose <b>Blank document</b>, and type a short paragraph.","Select text: double-click a word, triple-click a paragraph, or drag across it.","Use the <b>Home</b> tab to change font, size, bold, colour and highlight.","Red wavy underline means a spelling mistake: right-click it for suggestions. Blue double underline means grammar.","Save with <kbd>Ctrl</kbd>+<kbd>S</kbd> to your Word folder."],
+    "Type a short notice for parents about a tuition holiday, with a bold title and one highlighted line.",
+    ["Choose readable fonts such as Calibri, Aptos or Arial, size 11–12 for documents, 14+ for young children’s worksheets.","<kbd>Ctrl</kbd>+<kbd>Space</kbd> removes all character formatting from selected text."],
+    [["Course","Word tutorial (GCFGlobal, free)",GCF("word")],["Docs","Word help and learning (Microsoft)",SUP("word")],["Video","Word for beginners (Kevin Stratvert)",yt("Kevin Stratvert Microsoft Word for beginners")]]],
+   ["Paragraphs, lists and page setup","Control spacing, bullets, margins and paper size.",
+    "Margins are the red border lines of a school notebook; line spacing is choosing between single-line and double-line ruled paper.",
+    ["Click a paragraph and use <b>Home &gt; Bullets</b> or <b>Numbering</b>. Press <kbd>Tab</kbd> for a sub-point, <kbd>Shift</kbd>+<kbd>Tab</kbd> to go back.","<b>Home &gt; Line and Paragraph Spacing</b> sets space between lines (1.15 or 1.5 reads well).","<b>Layout &gt; Size &gt; A4</b> (standard in India) and <b>Layout &gt; Margins &gt; Normal</b>.","<b>Layout &gt; Orientation &gt; Landscape</b> for wide tables or charts.","Start a new page with <kbd>Ctrl</kbd>+<kbd>Enter</kbd> rather than pressing Enter many times."],
+    "Make a numbered list of 10 class rules on A4 paper with 1.5 spacing.",
+    ["Click <b>Home &gt; Show/Hide ¶</b> to see hidden marks; it explains most mysterious spacing problems.","Never use spaces to line up text; use Tab or a table."],
+    [["Course","Line and paragraph spacing (GCFGlobal)",GCF("word/line-and-paragraph-spacing/1")],["Course","Page layout (GCFGlobal)",GCF("word/page-layout/1")],["Video","Word bullets, numbering and page setup",yt("Microsoft Word bullets numbering page setup tutorial")]]],
+   ["Pictures, tables and templates","Build a classroom worksheet with images and a table.",
+    "A template is a ready-made rangoli stencil: the pattern is drawn, you just add your colours.",
+    ["<b>File &gt; New</b> and search templates such as “worksheet”, “certificate”, “lesson plan” or “flyer”.","<b>Insert &gt; Pictures</b> to add an image; click the <b>Layout Options</b> icon beside it and choose <b>Square</b> to wrap text.","<b>Insert &gt; Table</b> and drag to choose rows and columns.","Use <b>Table Design</b> for colours and <b>Layout</b> (table) to add rows or merge cells.","Press <kbd>Tab</kbd> in the last cell to add a new row."],
+    "Create a 1-page English or Maths worksheet with a title, a picture, and a 2-column question/answer table.",
+    ["<b>Insert &gt; Pictures &gt; Stock Images</b> offers free images and icons that are safe to use.","Microsoft Create has thousands of free education templates."],
+    [["Practice","Microsoft Create templates","https://create.microsoft.com/"],["Course","Tables (GCFGlobal)",GCF("word/tables/1")],["Video","Insert pictures and wrap text",yt("Word wrap text around picture tutorial")]]]
+  ],
+  intermediate:[
+   ["Styles, Navigation Pane and automatic Table of Contents","Format long documents consistently and jump to any section instantly.",
+    "Styles are a school uniform rule: change the rule once (say, blue headings), and every heading in the document changes together.",
+    ["Click a heading line and choose <b>Home &gt; Styles &gt; Heading 1</b>. Use Heading 2 for sub-headings.","Right-click <b>Heading 1</b> in the Styles gallery, choose <b>Modify</b>, and change font or colour; all Heading 1 text updates.","<b>View &gt; Navigation Pane</b> shows all headings; drag them to reorder whole sections.","Click at the top and choose <b>References &gt; Table of Contents</b>.","After edits, click the table of contents and choose <b>Update Table</b>."],
+    "Write a 4-page lesson plan document with headings for each week and an automatic table of contents.",
+    ["<b>Design &gt; Themes</b> changes all fonts and colours of styles at once.","Styles also make documents accessible to screen readers."],
+    [["Course","Styles (GCFGlobal)",GCF("word/styles/1")],["Docs","Insert a table of contents",SUP("word")],["Video","Word styles and table of contents",yt("Word styles table of contents tutorial")]]],
+   ["Headers, footers, page numbers and sections","Add school name, page numbers, and mix portrait with landscape pages.",
+    "Sections are chapters of a register with their own rules: one chapter can be landscape, the next portrait.",
+    ["<b>Insert &gt; Header</b>, type your name or institute; <b>Insert &gt; Page Number &gt; Bottom of Page</b>.","In Header &amp; Footer tab, tick <b>Different First Page</b> for a clean cover page.","To make one page landscape: place the cursor before it, <b>Layout &gt; Breaks &gt; Next Page</b>, and again after it.","Click inside that middle section and choose <b>Layout &gt; Orientation &gt; Landscape</b>.","If headers repeat unwanted text, untick <b>Link to Previous</b> in the new section’s header."],
+    "Add a cover page, page numbers that start on page 2, and one landscape page containing a wide timetable.",
+    ["<b>Insert &gt; Cover Page</b> gives ready designs.","Show/Hide ¶ shows the section breaks so you can delete them."],
+    [["Course","Headers and footers (GCFGlobal)",GCF("word/headers-and-footers/1")],["Course","Breaks (GCFGlobal)",GCF("word/breaks/1")],["Video","Section breaks explained",yt("Word section breaks landscape one page tutorial")]]],
+   ["Review tools: Track Changes, comments, Editor, Dictate, equations","Check and correct writing like an editor, and type maths properly.",
+    "Track Changes is your red pen: every correction stays visible, and the writer accepts or rejects each one.",
+    ["<b>Review &gt; Track Changes</b> on, then edit; changes show in colour. Use <b>Accept</b> or <b>Reject</b> to finalise.","<b>Review &gt; New Comment</b> to leave a note in the margin.","<b>Home &gt; Editor</b> checks spelling, grammar, clarity and conciseness.","<b>Home &gt; Dictate</b>: speak and Word types (works in many languages; check the language setting).","For maths worksheets: <b>Insert &gt; Equation</b>, or use the <b>Draw</b> tab’s Ink Equation to handwrite and convert."],
+    "Ask a family member to correct one of your worksheets with Track Changes on; accept or reject each edit. Add one fraction equation.",
+    ["<b>Review &gt; Read Aloud</b> reads your text; great for catching mistakes and for young learners.","Turn off Track Changes before sharing a final copy, and accept all changes."],
+    [["Course","Track Changes and comments (GCFGlobal)",GCF("word/track-changes-and-comments/1")],["Docs","Dictate in Microsoft 365",SUP("office")],["Video","Word equations tutorial",yt("Microsoft Word insert equation fraction tutorial")]]]
+  ],
+  advanced:[
+   ["Mail merge: 30 certificates in 5 minutes","Produce personalised letters, report cards or certificates from an Excel list.",
+    "Mail merge is a rubber stamp with a blank space for the name: Word stamps the design once for every row in your Excel list and writes each name in.",
+    ["Prepare an Excel list with headings: Name, Class, Award. Save and close it.","In Word, design the certificate, then <b>Mailings &gt; Start Mail Merge &gt; Letters</b>.","<b>Select Recipients &gt; Use an Existing List</b> and choose the Excel file.","Click where the name goes, <b>Insert Merge Field &gt; Name</b>; repeat for other fields.","<b>Preview Results</b> to check, then <b>Finish &amp; Merge &gt; Edit Individual Documents</b> to create all certificates."],
+    "Make participation certificates for all your tuition students from your Excel student list.",
+    ["Mail merge needs desktop Word.","The same steps send personalised emails through Outlook: choose <b>E-mail Messages</b> instead of Letters."],
+    [["Course","Using mail merge (GCFGlobal)",GCF("word/using-mail-merge/1")],["Docs","Mail merge with an Excel spreadsheet",SUP("word")],["Video","Mail merge certificates tutorial",yt("Word mail merge certificates from Excel")]]],
+   ["Long documents: captions, footnotes, citations, index","Format a research paper, thesis or training manual professionally.",
+    "References tools are a library catalogue for your own document: Word keeps track of every figure, source and page so you never number them by hand.",
+    ["<b>References &gt; Insert Footnote</b> for notes at the bottom of the page.","<b>References &gt; Insert Citation</b>, choose a style (APA is common in education), then <b>Bibliography</b> to build the reference list.","Right-click a picture, <b>Insert Caption</b>; then <b>References &gt; Insert Table of Figures</b>.","<b>References &gt; Cross-reference</b> writes “see Figure 3” and updates if numbering changes.","Mark index words with <b>References &gt; Mark Entry</b>, then <b>Insert Index</b>."],
+    "Reformat a section of your M.Ed. dissertation or an article idea with APA citations and a bibliography.",
+    ["Press <kbd>Ctrl</kbd>+<kbd>A</kbd> then <kbd>F9</kbd> to update all fields (captions, cross-references) before printing.","Keep long documents in OneDrive so Version History protects you."],
+    [["Docs","Add citations and a bibliography",SUP("word")],["Video","Word for thesis and research papers",yt("Microsoft Word thesis formatting captions citations")],["Blog","Purdue OWL: APA style guide","https://owl.purdue.edu/owl/research_and_citation/apa_style/apa_formatting_and_style_guide/general_format.html"]]],
+   ["Forms, Quick Parts, accessibility and Copilot","Create fillable forms, reuse text instantly and use AI help wisely.",
+    "Quick Parts are your stock phrases kept in a drawer, such as your address block or standard parent note, ready to drop in with one click.",
+    ["Show <b>Developer</b> tab (<b>File &gt; Options &gt; Customize Ribbon</b>). Add check boxes, drop-downs and date pickers from <b>Developer &gt; Controls</b>.","<b>Developer &gt; Restrict Editing &gt; Filling in forms</b> so parents can only fill the blanks.","Select reusable text, then <b>Insert &gt; Quick Parts &gt; Save Selection to Quick Part Gallery</b>.","<b>Review &gt; Check Accessibility</b> finds missing picture descriptions and poor contrast.","With an eligible Microsoft 365 plan, Copilot in Word can draft, summarise or rewrite. Use it for a first draft, then edit in your own voice."],
+    "Create a fillable student admission form with name, class (drop-down), date of birth (date picker) and consent check box.",
+    ["Microsoft Forms (forms.office.com) is better for forms filled on phones; Word forms suit printed or emailed documents.","Add alt text to every picture (right-click &gt; View Alt Text)."],
+    [["Docs","Create forms that users complete in Word",SUP("word")],["Docs","Make your Word documents accessible",SUP("accessibility")],["Video","Fillable forms in Word",yt("Word fillable form content controls tutorial")]]]
+  ]}},
+
+ {id:"powerpoint", name:"PowerPoint", color:"--c-ppt",
+  why:"PowerPoint is your digital blackboard. It serves classroom lessons, parent meetings, and, importantly for you, recorded video lessons you can upload straight to YouTube.",
+  hindi:"PowerPoint tutorial in Hindi",
+  levels:{
+  beginner:[
+   ["Slides, layouts and themes","Create a clean 5-slide presentation.",
+    "Slides are flashcards: one idea per card, big and clear, so students remember it.",
+    ["Open PowerPoint, choose a theme from the start screen or <b>Design</b> tab.","Click into the placeholders to type a title and subtitle.","<b>Home &gt; New Slide</b> and pick a layout (Title and Content, Two Content, Picture with Caption).","Change a slide’s layout anytime with <b>Home &gt; Layout</b>.","Press <kbd>F5</kbd> to present from the start, <kbd>Esc</kbd> to stop."],
+    "Make a 5-slide “About my tuition classes” presentation: who you are, subjects, timings, method, contact.",
+    ["Keep to one idea per slide and about 6 short lines at most.","Use the Design tab’s Variants to change colours without redoing slides."],
+    [["Course","PowerPoint tutorial (GCFGlobal, free)",GCF("powerpoint")],["Docs","PowerPoint help and learning",SUP("powerpoint")],["Video","PowerPoint for beginners (Kevin Stratvert)",yt("Kevin Stratvert PowerPoint for beginners")]]],
+   ["Pictures, icons, SmartArt and Designer","Make slides visual instead of text-heavy.",
+    "Turning bullet points into SmartArt is like turning a paragraph of instructions into a flowchart on the board: the same words, understood twice as fast.",
+    ["<b>Insert &gt; Pictures &gt; Stock Images</b> for free photos and illustrations.","<b>Insert &gt; Icons</b> for simple symbols (book, clock, phone).","Select a bulleted list, then <b>Home &gt; Convert to SmartArt</b> and choose a process or cycle.","When you add a picture, <b>Designer</b> (Home tab) suggests layouts on the right; click one you like.","Use <b>Picture Format &gt; Crop</b> to remove unwanted parts of a photo."],
+    "Convert “How my classes work” into a 4-step SmartArt process with icons.",
+    ["Designer needs an internet connection and a Microsoft 365 or web version.","Use high-quality images; a blurry image looks worse than no image."],
+    [["Course","SmartArt graphics (GCFGlobal)",GCF("powerpoint/smartart-graphics/1")],["Docs","PowerPoint Designer",SUP("powerpoint")],["Video","PowerPoint Designer and SmartArt",yt("PowerPoint Designer SmartArt tutorial beginners")]]],
+   ["Present with confidence","Use speaker notes, Presenter View and simple remote controls.",
+    "Presenter View is the teacher’s edition of the textbook: the class sees the slide, you see your notes and what comes next.",
+    ["Type what you will say in the <b>Notes</b> area below each slide (<b>View &gt; Notes</b> if hidden).","In Slide Show, choose <b>Use Presenter View</b> when connected to a projector or TV.","During the show: <kbd>B</kbd> blacks the screen, <kbd>Ctrl</kbd>+<kbd>L</kbd> shows a laser pointer, <kbd>Ctrl</kbd>+<kbd>P</kbd> a pen.","Type a slide number and press <kbd>Enter</kbd> to jump to it.","<b>Slide Show &gt; Rehearse with Coach</b> (Speaker Coach) gives feedback on pace and filler words."],
+    "Rehearse your 5-slide presentation with Speaker Coach and note your speaking pace.",
+    ["Practise once aloud with a timer; most people over-run.","Carry a PDF copy (<b>File &gt; Export &gt; PDF</b>) as a backup."],
+    [["Docs","Rehearse with Speaker Coach",SUP("powerpoint")],["Video","Presenter View tutorial",yt("PowerPoint presenter view tutorial")],["Blog","Duarte: presentation tips","https://www.duarte.com/resources/"]]]
+  ],
+  intermediate:[
+   ["Animations and transitions with purpose","Reveal answers one at a time, like covering the board with a chart paper.",
+    "An entrance animation is a hand lifting a cover off the answer, only when the class has guessed.",
+    ["Select an object, then <b>Animations &gt; Appear</b> or <b>Fade</b>.","Open <b>Animations &gt; Animation Pane</b> to see and reorder all effects.","Set <b>Start: On Click</b> so each answer appears when you click.","Duplicate a slide, move or resize things, then apply <b>Transitions &gt; Morph</b> for smooth movement.","Use the same, simple transition on every slide."],
+    "Make a 5-question quiz where each answer appears on click.",
+    ["Avoid spinning or bouncing effects; they distract learners.","Morph works when the same object appears on both slides."],
+    [["Course","Animating text and objects (GCFGlobal)",GCF("powerpoint/animating-text-and-objects/1")],["Docs","Use the Morph transition",SUP("powerpoint")],["Video","Morph transition tutorial",yt("PowerPoint Morph transition tutorial")]]],
+   ["Slide Master: your own brand on every slide","Set fonts, colours and logo once for all slides.",
+    "The Slide Master is a printed letterhead: design it once and every page already carries your name and colours.",
+    ["<b>View &gt; Slide Master</b>. The top, larger thumbnail controls all slides.","Change fonts and colours with <b>Fonts</b> and <b>Colors</b> on the Slide Master tab.","Insert your logo or name on the top master; it appears on every slide.","Adjust individual layouts (smaller thumbnails) as needed, then <b>Close Master View</b>.","<b>File &gt; Save As &gt; PowerPoint Template (.potx)</b> to reuse it."],
+    "Create a branded template for your tuition classes and video lessons.",
+    ["Pick 2 fonts and 3 colours and keep to them; this alone makes slides look professional.","Use Slide Master instead of copying a logo onto each slide."],
+    [["Course","Slide Master view (GCFGlobal)",GCF("powerpoint/modifying-themes/1")],["Video","Slide Master tutorial",yt("PowerPoint Slide Master tutorial")],["Practice","Free PowerPoint templates (Microsoft Create)","https://create.microsoft.com/"]]],
+   ["Charts, tables and storytelling","Present results so parents and students grasp them instantly.",
+    "A good slide story is like a good lesson: hook, explanation, example, homework.",
+    ["<b>Insert &gt; Chart</b>; a small Excel sheet opens for your numbers.","Delete gridlines and legends that are not needed; highlight the one bar that matters in a strong colour.","Write the conclusion as the slide title, for example “Maths scores rose 18% this term”.","Structure: problem → idea → example → action.","Use <b>Insert &gt; Table</b> for small data only; send detailed tables as handouts."],
+    "Create a 6-slide parents’ meeting deck showing term results with one clear chart per slide.",
+    ["Copy a chart from Excel and paste with <b>Keep Source Formatting &amp; Link Data</b> so it updates.","If a slide needs more than 30 seconds of explaining, split it."],
+    [["Course","Charts (GCFGlobal)",GCF("powerpoint/charts/1")],["Blog","Duarte: data storytelling","https://www.duarte.com/resources/"],["Video","Make better PowerPoint charts",yt("PowerPoint chart design tips better charts")]]]
+  ],
+  advanced:[
+   ["Record narrated lessons and export to video for YouTube","Turn slides into a video lesson with your voice and webcam.",
+    "PowerPoint becomes your recording studio: the slides are the board, your webcam is the camera, and the export is the finished video, without extra software.",
+    ["Use a 16:9 slide size (<b>Design &gt; Slide Size &gt; Widescreen</b>).","<b>Record &gt; From Beginning</b> (or <b>Slide Show &gt; Record</b> in some versions). Choose camera and microphone at the bottom.","Press the red record button, teach, use the pen to underline, then stop.","<b>File &gt; Export &gt; Create a Video</b>, choose <b>Full HD (1080p)</b>, and save as MP4.","For a YouTube thumbnail, design one slide, then <b>File &gt; Save As</b> and choose <b>PNG</b> (current slide only)."],
+    "Record a 5-minute lesson (for example, “Using fractions in daily life”) and export it as an MP4.",
+    ["Recording works per slide, so you can re-record one slide without redoing the whole video.","Use a cheap clip-on microphone; sound quality matters more than video quality."],
+    [["Docs","Record a slide show with narration",SUP("powerpoint")],["Docs","Turn a presentation into a video",SUP("powerpoint")],["Video","Record video lessons in PowerPoint",yt("record video lesson PowerPoint webcam export MP4 YouTube")]]],
+   ["Interactive slides: Zoom, links and quiz games","Build non-linear lessons and classroom games.",
+    "Summary Zoom is a menu card: students choose a topic and you jump straight there and back.",
+    ["<b>Insert &gt; Zoom &gt; Summary Zoom</b> and pick the first slide of each topic.","Select text or a shape, <b>Insert &gt; Link &gt; Place in This Document</b> to jump to a slide.","For a quiz: make answer shapes, add an animation, then <b>Animation Pane &gt; Timing &gt; Triggers &gt; On Click of</b> a shape.","Add a “Home” button linked to the menu slide on each section.","Test everything in Slide Show mode."],
+    "Make a “Jeopardy-style” revision game with a menu slide and 9 question slides.",
+    ["Kiosk mode (<b>Slide Show &gt; Set Up Slide Show &gt; Browsed at a kiosk</b>) stops accidental clicks moving ahead.","Save interactive files as .pptx; PDFs lose the interactivity."],
+    [["Docs","Use Zoom for PowerPoint",SUP("powerpoint")],["Video","Interactive quiz game in PowerPoint",yt("PowerPoint interactive quiz game triggers tutorial")],["Video","Technology for Teachers and Students",yt("Technology for Teachers and Students PowerPoint")]]],
+   ["Professional design and Copilot","Align, layer and combine shapes like a designer, and use AI drafts sensibly.",
+    "Alignment tools are a ruler and set-square: perfect lines without measuring by eye.",
+    ["Select several objects, <b>Shape Format &gt; Align &gt; Align Middle</b> and <b>Distribute Horizontally</b>.","<b>Home &gt; Arrange &gt; Selection Pane</b> to name, hide and reorder layered objects.","Double-click <b>Format Painter</b> to copy formatting onto many objects.","<b>Shape Format &gt; Merge Shapes</b> to create custom icons and cut-outs.","With an eligible Microsoft 365 plan, Copilot can draft a presentation from a Word document; always review facts and design."],
+    "Redesign your parents’ meeting deck so every element aligns on a grid and uses your Slide Master.",
+    ["White space is not wasted space; it directs the eye.","Turn on <b>View &gt; Guides</b> for consistent margins."],
+    [["Blog","Duarte resources (presentation design)","https://www.duarte.com/resources/"],["Video","PowerPoint design tips",yt("PowerPoint design tips align distribute selection pane")],["Docs","Copilot in PowerPoint",SUP("copilot")]]]
+  ]}},
+
+ {id:"outlook", name:"Outlook", color:"--c-outlook",
+  why:"Outlook brings email, calendar and contacts into one place. For tuition work it means professional emails to parents, reminders for every class, and an inbox that never overwhelms you.",
+  hindi:"Outlook tutorial in Hindi",
+  levels:{
+  beginner:[
+   ["Email essentials: compose, reply, CC, BCC, attachments","Send clear, professional emails.",
+    "CC is letting someone read over your shoulder. BCC is a hidden copy: perfect for emailing all parents without revealing everyone’s email address.",
+    ["Open Outlook (desktop, or outlook.com) and click <b>New mail</b>.","Fill <b>To</b>, a clear <b>Subject</b> (for example, “Class timings from 10 Nov”), and the message.","Click <b>Attach</b> (paperclip) to add a file, or choose a OneDrive file to share a link.","To add BCC: in the message, choose <b>Options &gt; Show BCC</b> (or the BCC link beside To).","Use <b>Reply</b> for the sender only, <b>Reply all</b> for everyone, <b>Forward</b> to pass it on."],
+    "Email three family members a short notice with an attachment, using BCC.",
+    ["Write the subject last; it should say what the email is about in 6–8 words.","Check the To line before pressing Send; most email mistakes happen there."],
+    [["Course","Outlook / email basics (GCFGlobal)",GCF("subjects/email")],["Docs","Outlook help and learning",SUP("outlook")],["Video","Outlook for beginners (Kevin Stratvert)",yt("Kevin Stratvert Outlook tutorial beginners")]]],
+   ["Calendar: classes, reminders and recurring events","Never miss a class or parent meeting.",
+    "The calendar is your timetable on the staffroom wall, except it rings a bell 15 minutes before each period.",
+    ["Click the <b>Calendar</b> icon (left side).","Double-click a time slot, type a title like “Class 7 Maths”, add location or online link.","Set a <b>Reminder</b> (15 minutes) and choose <b>Repeat &gt; Weekly</b> on Mon, Wed, Fri.","Add attendees’ emails to send an invitation.","Use <b>Day / Work week / Month</b> views to plan ahead."],
+    "Put your full weekly tuition timetable into Outlook calendar as recurring events.",
+    ["Colour-code events with categories (Maths green, English blue).","Install the Outlook app on your phone so reminders follow you."],
+    [["Docs","Calendar in Outlook",SUP("outlook")],["Video","Outlook calendar tutorial",yt("Outlook calendar tutorial recurring meeting reminder")],["Course","Email basics (GCFGlobal)",GCF("subjects/email")]]],
+   ["Contacts, contact lists and signatures","Store parent details and sign emails professionally.",
+    "A contact list is a class register for email: write the group name once and every parent is included.",
+    ["Click the <b>People</b> icon, then <b>New contact</b> and enter name, email and phone.","Choose <b>New contact list</b> (or contact group), name it “Class 7 Parents”, and add members.","Type the list name in the To or BCC field to email them all.","Create a signature: <b>Settings &gt; Account &gt; Signatures</b> (new Outlook/web) or <b>File &gt; Options &gt; Mail &gt; Signatures</b> (classic).","Include name, role, phone, and a single line about your classes."],
+    "Create a “Parents” contact list and a professional email signature.",
+    ["Keep signatures short: 3–4 lines, no large images.","Back up contacts by exporting them occasionally."],
+    [["Docs","Create an email signature",SUP("outlook")],["Docs","Create a contact list",SUP("outlook")],["Video","Outlook contacts and contact groups",yt("Outlook create contact group distribution list tutorial")]]]
+  ],
+  intermediate:[
+   ["Organise: folders, categories, flags and archive","Keep the inbox calm and find any email fast.",
+    "Organising email is like sorting the morning post into trays: to act, to read, to file, to throw.",
+    ["Right-click your mailbox name, <b>Create new folder</b>: Parents, Fees, Personal.","Drag emails into folders, or use <b>Move to</b>.","Right-click an email &gt; <b>Categorize</b> to add a colour label.","Click the flag to mark emails that need action; they also appear in Microsoft To Do.","Use <b>Archive</b> for done emails, and <b>Sweep</b> (web/new Outlook) to clean out bulk senders."],
+    "Set up 3 folders and 3 categories, then process your inbox down to only flagged items.",
+    ["Use few folders and good search, rather than dozens of folders.","Focused Inbox puts important mail in Focused and the rest in Other."],
+    [["Docs","Organize email with folders and categories",SUP("outlook")],["Video","Organise your Outlook inbox",yt("organize Outlook inbox folders categories flags tutorial")],["Blog","Microsoft 365 blog","https://www.microsoft.com/en-us/microsoft-365/blog/"]]],
+   ["Rules and powerful search","Let Outlook file emails automatically and find anything in seconds.",
+    "A rule is a helpful peon at the gate: “Every letter from the school office goes straight to the Principal’s tray.”",
+    ["Right-click an email from a parent &gt; <b>Rules &gt; Create rule</b> (or <b>Settings &gt; Mail &gt; Rules</b>).","Condition: <b>From</b> that person; Action: <b>Move to</b> folder “Parents”. Save.","Search tips in the search box: <code>from:ravi</code>, <code>subject:fees</code>, <code>hasattachments:yes</code>.","Combine them: <code>from:ravi hasattachments:yes</code>.","Use the search filters button to search by date range."],
+    "Create a rule that moves all emails with “fee” in the subject to your Fees folder.",
+    ["Test a new rule on a few emails before trusting it.","Search beats scrolling: get used to typing in the search box first."],
+    [["Docs","Manage email with rules",SUP("outlook")],["Docs","Search in Outlook",SUP("outlook")],["Video","Outlook rules tutorial",yt("Outlook rules tutorial move emails automatically")]]],
+   ["Schedule send, automatic replies, templates and online meetings","Work smarter with time-savers.",
+    "Schedule send is writing a letter tonight and asking the postman to deliver it at 9 am.",
+    ["Write an email, click the arrow beside <b>Send &gt; Schedule send</b>, choose a time.","Holidays: <b>Settings &gt; Account &gt; Automatic replies</b> (classic: <b>File &gt; Automatic Replies</b>).","Save frequent replies as templates: in new Outlook/web use <b>My Templates</b> (from the Apps or … menu); classic Outlook can use Quick Parts.","Use <b>Scheduling Assistant</b> in a new meeting to find a free time for everyone.","Add a <b>Teams meeting</b> link to an event for online classes."],
+    "Save two templates (fee reminder, class cancellation) and schedule one message for tomorrow morning.",
+    ["Schedule emails to parents for a sensible hour, not late at night.","Keep templates polite and short; personalise the first line."],
+    [["Docs","Delay or schedule sending messages",SUP("outlook")],["Docs","Send automatic out-of-office replies",SUP("outlook")],["Video","Outlook tips and tricks",yt("Outlook tips and tricks 2026")]]]
+  ],
+  advanced:[
+   ["Calendar mastery: sharing, time zones, bookings","Coordinate students in India and abroad, and let parents book sessions.",
+    "Two time zones on the calendar are like a wall clock for India and one for the USA, side by side in the staffroom.",
+    ["Add a second time zone: <b>Settings &gt; Calendar &gt; View/Time zones</b> (classic: <b>File &gt; Options &gt; Calendar</b>).","Create separate calendars (Tuition, Family) and overlay them.","<b>Share</b> a calendar with family, choosing “can view when I’m busy” or full details.","Microsoft Bookings (with business plans) gives parents a booking page for trial classes.","Publish free/busy times instead of sharing private details."],
+    "Add IST and one overseas time zone, create a separate Tuition calendar, and share it as “busy only”.",
+    ["Always state the time zone in invitations for online students, for example “7 pm IST”.","Shared calendars remove a lot of back-and-forth messages."],
+    [["Docs","Share your calendar in Outlook",SUP("outlook")],["Docs","Microsoft Bookings",SUP("bookings")],["Video","Outlook calendar advanced tips",yt("Outlook calendar advanced tips time zones sharing")]]],
+   ["Inbox zero system: Quick Steps, To Do and Copilot","Spend 15 minutes a day on email, not 2 hours.",
+    "Inbox zero is cleaning the teacher’s desk at the end of each day: everything is done, delegated, scheduled or filed.",
+    ["Process each email once: <b>Do</b> (under 2 minutes), <b>Defer</b> (flag), <b>Delegate</b> (forward), or <b>Delete/Archive</b>.","Create a Quick Step: move to folder + mark read + categorise in one click.","Flagged emails appear in <b>Microsoft To Do</b>; plan your day there.","Unsubscribe from newsletters you never read.","With an eligible Microsoft 365 plan, Copilot in Outlook can summarise long threads and draft replies; edit before sending."],
+    "Follow the 4-D method for one week and create one Quick Step.",
+    ["Check email at fixed times (for example, 9 am and 5 pm) instead of all day.","Turn off desktop notifications for non-urgent mail."],
+    [["Docs","Automate common tasks with Quick Steps",SUP("outlook")],["Docs","Microsoft To Do help",SUP("todo")],["Video","Inbox zero with Outlook",yt("inbox zero Outlook Quick Steps To Do")]]]
+  ]}},
+
+ {id:"onenote", name:"OneNote", color:"--c-onenote",
+  why:"OneNote is a digital binder for lesson plans, ideas, worksheets, photos of textbook pages and voice notes, all searchable. It is also built for teachers through OneNote Class Notebook.",
+  hindi:"OneNote tutorial in Hindi",
+  levels:{
+  beginner:[
+   ["Notebooks, sections and pages","Set up a teaching notebook that saves automatically.",
+    "OneNote is a ring binder: the notebook is the binder, sections are the coloured dividers, and pages are the sheets inside.",
+    ["Open OneNote (desktop or onenote.com) and create a new notebook named <code>Teaching</code>, saved to OneDrive.","Add sections: Class 6, Class 7, Ideas, YouTube.","In each section, add pages: one per lesson or topic.","Click anywhere on the page and type; there is no Save button, everything saves itself.","Drag pages up/down to reorder, or right-click to make a <b>subpage</b>."],
+    "Create your Teaching notebook with 4 sections and 2 lesson pages each.",
+    ["Keep page titles specific (“Fractions: introduction”), because they become your table of contents.","One notebook per area of life (Teaching, Home) is plenty."],
+    [["Docs","OneNote help and learning",SUP("onenote")],["Video","OneNote for beginners (Kevin Stratvert)",yt("Kevin Stratvert OneNote tutorial beginners")],["Course","Office tutorials (GCFGlobal)",GCF("subjects/office")]]],
+   ["Typing, pictures, files, audio and tags","Collect every kind of material in one page.",
+    "A OneNote page is a scrapbook: paste a photo, stick a printout, write a note in the margin, even tape a voice message.",
+    ["Type notes, or paste screenshots and web text.","<b>Insert &gt; Pictures</b> or photograph a textbook page with the OneNote phone app.","<b>Insert &gt; File</b> (attach or print a worksheet onto the page).","<b>Insert &gt; Audio</b> to record yourself explaining an idea.","Tag lines with <b>Home &gt; Tags</b>: To Do (tick box), Important, Question."],
+    "Make a lesson page with notes, a photo of a textbook page, an attached worksheet and a to-do list.",
+    ["<kbd>Ctrl</kbd>+<kbd>1</kbd> adds a To Do tick box instantly.","Search finds words even inside pictures (OCR) on most versions."],
+    [["Docs","Insert pictures and files in OneNote",SUP("onenote")],["Video","OneNote tags and audio recording",yt("OneNote tags audio recording tutorial")],["Docs","Microsoft 365 Training Center",MS_TRAIN]]],
+   ["Draw, handwrite and convert","Use a pen or finger to write and turn handwriting into text or maths.",
+    "The Draw tab is your chalk box: pens, highlighters and an eraser, but the chalk can turn itself into neat typing.",
+    ["Click the <b>Draw</b> tab; choose a pen, colour and thickness.","Write or sketch with a mouse, touchscreen or stylus.","Use <b>Lasso Select</b> to select handwriting, then <b>Ink to Text</b>.","Write a maths problem, select it and use <b>Math</b> (Math Assistant) to see steps or a graph, where available.","Use the highlighter for key points."],
+    "Handwrite 3 maths problems, convert one to text, and let Math Assistant solve another.",
+    ["A cheap stylus helps a lot on touchscreen laptops or tablets.","Math Assistant availability depends on version; OneNote on the web and Windows support it."],
+    [["Docs","Draw and sketch notes in OneNote",SUP("onenote")],["Video","OneNote Math Assistant",yt("OneNote Math Assistant tutorial")],["Video","Technology for Teachers and Students: OneNote",yt("Technology for Teachers and Students OneNote")]]]
+  ],
+  intermediate:[
+   ["Organise and find: templates, links, search, text from pictures","Build a notebook you can navigate in seconds.",
+    "Page links are cross-references in a textbook (“see page 45”), but you just click to get there.",
+    ["Type <code>[[Fractions: introduction]]</code> to create a link to that page (desktop).","Right-click any page or section &gt; <b>Copy Link</b>, paste anywhere.","Use page templates (<b>Insert &gt; Page Templates</b> in OneNote for Windows) for consistent lesson plans.","<kbd>Ctrl</kbd>+<kbd>E</kbd> searches all notebooks.","Right-click an image &gt; <b>Copy Text from Picture</b> to grab printed text."],
+    "Create a lesson-plan template page and a contents page that links to every lesson.",
+    ["Make one “Start here” page at the top of each notebook with links.","Use dates in page titles for meeting notes."],
+    [["Docs","Create links to notes",SUP("onenote")],["Docs","Search notes in OneNote",SUP("onenote")],["Video","OneNote organisation tips",yt("OneNote organization tips links templates")]]],
+   ["Share, collaborate, Immersive Reader and Dictate","Work with others and support young or struggling readers.",
+    "A shared notebook is a common staffroom register: everyone writes in it, everyone sees the latest version.",
+    ["<b>Share</b> (top right), enter emails, choose view or edit.","Others’ edits appear with their initials.","<b>View &gt; Immersive Reader</b> reads text aloud with highlighting and spacing options; excellent for children learning to read.","<b>Home &gt; Dictate</b> to speak notes.","<b>History</b> tab (desktop) shows page versions."],
+    "Share a “Family plans” notebook with a relative and try Immersive Reader with a child.",
+    ["Share a single section (desktop) instead of a whole notebook when needed.","Immersive Reader also works in Word and Outlook."],
+    [["Docs","Share a OneNote notebook",SUP("onenote")],["Docs","Immersive Reader in OneNote",SUP("onenote")],["Course","Microsoft Learn Educator Center","https://learn.microsoft.com/en-us/training/educator-center/"]]]
+  ],
+  advanced:[
+   ["OneNote Class Notebook for teaching","Run a paperless class: distribute worksheets, collect work, give feedback.",
+    "A Class Notebook has three parts: the student’s own copybook (private), the teacher’s cupboard of handouts (Content Library, read-only), and the group project chart (Collaboration Space).",
+    ["Class Notebook needs a Microsoft 365 Education account (a school sign-in).","Create it from the OneNote Class Notebook tool, and add student names.","Put handouts in the <b>Content Library</b>.","Use <b>Distribute Page</b> to place a worksheet in every student’s notebook.","Review student pages, write feedback in ink or text."],
+    "Plan how you would run one week of a class with a Class Notebook (or create one if you have access to a school account).",
+    ["Even without a school account, a shared notebook with one section per student can imitate the idea.","Learn the Educator Center courses for free badges and certificates."],
+    [["Docs","OneNote Class Notebook",SUP("onenote")],["Course","Microsoft Learn Educator Center","https://learn.microsoft.com/en-us/training/educator-center/"],["Video","OneNote Class Notebook tutorial",yt("OneNote Class Notebook tutorial teachers")]]],
+   ["A second brain: OneNote with Outlook, To Do and Copilot","Connect notes, emails and tasks into one system.",
+    "Your second brain is a well-kept teacher’s diary that never gets lost and can be searched in a second.",
+    ["In classic Outlook, select an email &gt; <b>Send to OneNote</b>.","From a calendar event, choose <b>Meeting Notes</b> to start a linked OneNote page.","Tag tasks with To Do and use <b>Find Tags</b> to list them all.","Use a simple structure: Projects (active work), Areas (ongoing), Resources (references), Archive.","With an eligible Microsoft 365 plan, Copilot in OneNote can summarise pages and create to-do lists; check its output."],
+    "Create a “YouTube channel” section with ideas, scripts and a content calendar, linked to Outlook events.",
+    ["Review your notebook once a week for 15 minutes.","Archive old sections instead of deleting them."],
+    [["Docs","Take meeting notes in OneNote",SUP("onenote")],["Video","OneNote productivity system",yt("OneNote productivity system second brain")],["Docs","Copilot in OneNote",SUP("copilot")]]]
+  ]}}
+];
+
+const LEVELS = [["beginner","Beginner","Comfortable with the basics; can create simple, neat work."],["intermediate","Intermediate","Works faster, organises information, uses formulas and features with purpose."],["advanced","Advanced","Automates, analyses, designs and teaches others."]];
+
+const PROJECTS = [
+ {stage:"End of Stage 1 · Beginner", title:"My tuition starter kit", items:["Word: one-page flyer for your classes with a picture","Excel: student list with marks, totals and a chart","PowerPoint: 5-slide “About my classes” presentation","Outlook: professional signature and recurring class timetable","OneNote: Teaching notebook with sections per class"]},
+ {stage:"End of Stage 2 · Intermediate", title:"Term results kit", items:["Excel: marks register with percentage, IF grades, conditional formatting and fee tracker table","Word: report-card template using styles, headers and page numbers","PowerPoint: parents’ meeting deck with a branded Slide Master and clear charts","Outlook: Parents contact list, rules and two email templates","OneNote: linked lesson-plan template and contents page"]},
+ {stage:"End of Stage 3 · Advanced", title:"Run it like a business", items:["Excel: fee dashboard with PivotTables, slicers and a pending-fees FILTER list","Word: mail-merged certificates for every student","PowerPoint: a recorded 5-minute video lesson exported for YouTube","Outlook: shared “busy only” calendar and an inbox-zero routine","OneNote: content calendar for your YouTube channel"]}
+];
+
+const LIBRARY = [
+ {h:"Official Microsoft learning", items:[["Microsoft 365 Training Center","Short official videos for every app",MS_TRAIN],["Microsoft Learn","Free self-paced modules and learning paths","https://learn.microsoft.com/en-us/training/"],["Microsoft Learn Educator Center","Free courses for teachers with badges","https://learn.microsoft.com/en-us/training/educator-center/"],["Microsoft Support","Search any “how do I…” question","https://support.microsoft.com/"],["Microsoft Create","Free templates for worksheets, certificates, slides","https://create.microsoft.com/"]]},
+ {h:"Free structured courses", items:[["GCFGlobal: Excel","Step-by-step text and video lessons",GCF("excel")],["GCFGlobal: Word","From basics to mail merge",GCF("word")],["GCFGlobal: PowerPoint","Slides, animations, Slide Master",GCF("powerpoint")],["GCFGlobal: Office & email","Office basics and email skills",GCF("subjects/office")]]},
+ {h:"YouTube channels", items:[["Kevin Stratvert","Clear beginner tutorials for every Office app","https://www.youtube.com/@KevinStratvert"],["Leila Gharani","Excel from intermediate to advanced, very clear","https://www.youtube.com/@LeilaGharani"],["ExcelIsFun","Huge free Excel course library","https://www.youtube.com/@excelisfun"],["MyOnlineTrainingHub","Excel dashboards, Power Query","https://www.youtube.com/@MyOnlineTrainingHub"],["Technology for Teachers and Students","Office for classroom use",yt("Technology for Teachers and Students")],["Hindi-language tutorials","Search results for Office in Hindi",yt("MS Office complete course in Hindi")]]},
+ {h:"Blogs and reference sites", items:[["Exceljet","Clear explanations of every Excel function","https://exceljet.net/"],["Chandoo.org","Excel tips and dashboards (Indian author)","https://chandoo.org/wp/"],["Excel Campus","Excel tutorials and productivity","https://www.excelcampus.com/"],["Contextures","Excel tips, pivot tables, data validation","https://www.contextures.com/"],["Duarte","Presentation and storytelling resources","https://www.duarte.com/resources/"],["Microsoft 365 Blog","What is new in Office","https://www.microsoft.com/en-us/microsoft-365/blog/"]]},
+ {h:"White papers, reports and guides", items:[["Microsoft Work Trend Index","Research reports on how work and AI skills are changing","https://www.microsoft.com/en-us/worklab/work-trend-index"],["Microsoft accessibility guides","Make documents usable by everyone",SUP("accessibility")],["Purdue OWL: APA style","Citation and formatting reference for academic writing","https://owl.purdue.edu/owl/research_and_citation/apa_style/apa_formatting_and_style_guide/general_format.html"],["Microsoft Office Specialist (MOS)","Exam overview and objectives","https://certiport.pearsonvue.com/Certifications/Microsoft/MOS/Overview"]]},
+ {h:"Practice tools", items:[["Free Office on the web","Practise without buying anything","https://www.microsoft.com/en-us/microsoft-365/free-office-online-for-the-web"],["Keybr","Typing practice","https://www.keybr.com/"],["Microsoft Forms","Make quizzes and surveys for students","https://forms.office.com/"]]}
+];
+
+const GLOSSARY = [
+ ["Ribbon","The band of tabs and buttons at the top of every Office app."],
+ ["OneDrive","Your online storage; files there are backed up and open on any device."],
+ ["AutoSave","Saves your file every few seconds when it is stored in OneDrive."],
+ ["Template","A ready-made design you fill in, like a printed form."],
+ ["Workbook / Worksheet","An Excel file is a workbook; each tab inside it is a worksheet."],
+ ["Cell / Range","One box in Excel (B3) / a block of boxes (B2:D10)."],
+ ["Formula / Function","A calculation starting with = / a ready-made formula like SUM or IF."],
+ ["Absolute reference","A locked cell address with $ signs, such as $G$1."],
+ ["PivotTable","An Excel tool that groups and totals a long list in seconds."],
+ ["Power Query","Excel’s tool for collecting and cleaning data from many files."],
+ ["Macro","A recorded set of steps you can replay with one click."],
+ ["Style","A saved set of formatting (font, size, colour) for headings or text."],
+ ["Section break","Divides a Word document so parts can have different layouts."],
+ ["Mail merge","Creating many personalised documents from one design and a list."],
+ ["Slide Master","The hidden master slide that sets the design for every slide."],
+ ["Morph","A PowerPoint transition that smoothly moves objects between slides."],
+ ["CC / BCC","Visible copy / hidden copy of an email."],
+ ["Rule","An instruction for Outlook to file or flag emails automatically."],
+ ["Notebook / Section / Page","OneNote’s binder / divider / sheet."],
+ ["Tag","A marker in OneNote such as To Do or Important."],
+ ["Copilot","Microsoft’s AI assistant inside Office apps (with eligible plans)."],
+ ["Microsoft 365","The subscription that includes the Office apps, OneDrive storage and updates."]
+];
+
+/* ---------- progress (per-browser convenience) ---------- */
+const KEY="omp-done-v1";
+let done = {};
+try{ done = JSON.parse(localStorage.getItem(KEY)||"{}") || {}; }catch(e){ done = {}; }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(done)); }catch(e){} }
+
+/* ---------- build ---------- */
+const esc = s => s; // content is authored here, contains intentional HTML
+function lessonsOf(t){ const out=[]; LEVELS.forEach(([k])=>{ (t.levels[k]||[]).forEach((l,i)=>out.push({t, level:k, l, id:t.id+"-"+k+"-"+(i+1), n:out.length+1})); }); return out; }
+const ALL = TRACKS.flatMap(lessonsOf);
+
+function nav(){
+  const items = [["home","Home",null]].concat(TRACKS.map(t=>[t.id,t.name,t.color])).concat([["projects","Projects",null],["resources","Resources",null],["glossary","Glossary",null]]);
+  document.getElementById("tracknav").innerHTML = items.map(([id,name,c])=>`<a href="#${id}" data-id="${id}">${c?`<span class="dot" style="background:var(${c})"></span>`:""}${name}</a>`).join("");
+}
+
+function lessonHTML(x){
+  const [title,goal,analogy,steps,tryit,tips,res]=x.l;
+  const d = !!done[x.id];
+  return `<details class="lesson" id="${x.id}">
+   <summary><span class="num">${String(x.n).padStart(2,"0")}</span><span class="sumtext"><b>${title}</b><span>${goal}</span></span><span class="state ${d?"done":""}" data-state="${x.id}">${d?"Done":"Not started"} <span class="chev" aria-hidden="true">›</span></span></summary>
+   <div class="lbody">
+    <div class="box analogy full"><h4>Real-life analogy</h4><p>${analogy}</p></div>
+    <div class="box"><h4>Step by step</h4><ol>${steps.map(s=>`<li>${s}</li>`).join("")}</ol></div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="box"><h4>Try it</h4><p>${tryit}</p></div>
+      <div class="box"><h4>Tips and tricks</h4><ul>${tips.map(s=>`<li>${s}</li>`).join("")}</ul></div>
+    </div>
+    <div class="box full"><h4>Watch and read</h4><ul class="res">${res.map(([ty,lab,url])=>`<li><span class="rtype">${ty}</span><a href="${url}" target="_blank" rel="noopener">${lab}</a></li>`).join("")}</ul></div>
+    <div class="actions full"><button type="button" class="mark ${d?"done":""}" data-mark="${x.id}">${d?"✓ Done (click to undo)":"Mark as done"}</button></div>
+   </div></details>`;
+}
+
+function trackViews(){
+  const host=document.getElementById("trackViews");
+  host.innerHTML = TRACKS.map((t,ti)=>{
+    const prev = ti>0?TRACKS[ti-1]:null, next = TRACKS[ti+1];
+    const lv = LEVELS.filter(([k])=>t.levels[k]).map(([k,name,desc])=>`
+      <div class="level" id="${t.id}-${k}-level">
+        <div class="levelhead"><span class="tag">${name}</span><h2>${t.name}: ${name}</h2><p>${desc}</p></div>
+        ${lessonsOf(t).filter(x=>x.level===k).map(lessonHTML).join("")}
+      </div>`).join("");
+    return `<section class="view stack" id="v-${t.id}" style="--track:var(${t.color})">
+      <div class="trackhead">
+        <h1>${t.name}</h1>
+        <p class="why">${t.why}</p>
+        <div class="bar" style="max-width:420px"><span data-bar="${t.id}"></span></div>
+        <div class="row"><small data-count="${t.id}" style="color:var(--muted);font-variant-numeric:tabular-nums"></small>
+          ${LEVELS.filter(([k])=>t.levels[k]).map(([k,n])=>`<a class="pill" href="#${t.id}" data-jump="${t.id}-${k}-level">${n}</a>`).join("")}
+          <a class="pill" href="${yt(t.hindi)}" target="_blank" rel="noopener">Prefer Hindi? Videos ↗</a>
+        </div>
+      </div>
+      ${lv}
+      <div class="nexttrack">${prev?`<a href="#${prev.id}">← ${prev.name}</a>`:`<span></span>`}${next?`<a href="#${next.id}">Next: ${next.name} →</a>`:`<a href="#projects">Next: Practice projects →</a>`}</div>
+    </section>`;
+  }).join("");
+}
+
+function roadmap(){
+  const head = `<thead><tr><th>App</th>${LEVELS.map(([k,n],i)=>`<th>Stage ${i+1}: ${n}<small>${["Days 1–14","Days 15–30","Days 31–45"][i]}</small></th>`).join("")}</tr></thead>`;
+  const body = TRACKS.map(t=>`<tr><th style="color:var(${t.color})">${t.name}</th>${LEVELS.map(([k])=>`<td>${lessonsOf(t).filter(x=>x.level===k).map(x=>`<a href="#${t.id}" data-open="${x.id}" class="${done[x.id]?"done":""}">${x.l[0]}</a>`).join("")||(t.id==="foundations"&&k!=="beginner"?`<span style="color:var(--muted)">Done in Stage 1</span>`:"")}</td>`).join("")}</tr>`).join("");
+  document.getElementById("roadmapTable").innerHTML = head+"<tbody>"+body+"</tbody>";
+}
+
+function progress(){
+  document.getElementById("progressGrid").innerHTML = TRACKS.map(t=>{
+    const ls=lessonsOf(t), n=ls.filter(x=>done[x.id]).length;
+    return `<a class="ptile" href="#${t.id}" style="--track:var(${t.color})"><b>${t.name}</b><div class="bar"><span style="width:${Math.round(n/ls.length*100)}%"></span></div><small>${n} of ${ls.length} lessons done</small></a>`;
+  }).join("");
+  TRACKS.forEach(t=>{
+    const ls=lessonsOf(t), n=ls.filter(x=>done[x.id]).length;
+    const b=document.querySelector(`[data-bar="${t.id}"]`); if(b) b.style.width=Math.round(n/ls.length*100)+"%";
+    const c=document.querySelector(`[data-count="${t.id}"]`); if(c) c.textContent=`${n} of ${ls.length} lessons done`;
+  });
+  roadmap();
+}
+
+function extras(){
+  document.getElementById("projectCards").innerHTML = PROJECTS.map(p=>`<div class="card"><span class="stage">${p.stage}</span><h3>${p.title}</h3><ul>${p.items.map(i=>`<li>${i}</li>`).join("")}</ul></div>`).join("");
+  document.getElementById("resLibrary").innerHTML = LIBRARY.map(g=>`<div class="card"><h3>${g.h}</h3><ul>${g.items.map(([n,d,u])=>`<li><a href="${u}" target="_blank" rel="noopener">${n}</a><small>${d}</small></li>`).join("")}</ul></div>`).join("");
+  document.getElementById("glossaryList").innerHTML = GLOSSARY.map(([a,b])=>`<div><b>${a}</b><span>${b}</span></div>`).join("");
+}
+
+/* ---------- routing ---------- */
+const VIEWS = ["home",...TRACKS.map(t=>t.id),"projects","resources","glossary"];
+function route(){
+  let h = (location.hash||"#home").slice(1);
+  if(!VIEWS.includes(h)) h="home";
+  document.querySelectorAll("section.view").forEach(s=>s.classList.toggle("on", s.id==="v-"+h));
+  document.querySelectorAll("#tracknav a").forEach(a=>{ if(a.dataset.id===h) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current"); });
+  const cur=document.querySelector(`#tracknav a[data-id="${h}"]`); if(cur) cur.scrollIntoView({block:"nearest",inline:"center"});
+  if(!pendingOpen) window.scrollTo(0,0);
+}
+let pendingOpen=null;
+window.addEventListener("hashchange",()=>{ route(); if(pendingOpen){ openLesson(pendingOpen); pendingOpen=null; } });
+
+function openLesson(id){
+  const el=document.getElementById(id); if(!el) return;
+  el.open=true; setTimeout(()=>el.scrollIntoView({behavior:"smooth",block:"start"}),30);
+}
+
+document.addEventListener("click",e=>{
+  const o=e.target.closest("[data-open]");
+  if(o){ const id=o.dataset.open, tr=o.getAttribute("href").slice(1);
+    if(location.hash.slice(1)===tr){ e.preventDefault(); openLesson(id); } else { pendingOpen=id; } return; }
+  const j=e.target.closest("[data-jump]");
+  if(j){ e.preventDefault(); const el=document.getElementById(j.dataset.jump); if(el) el.scrollIntoView({behavior:"smooth"}); return; }
+  const m=e.target.closest("[data-mark]");
+  if(m){ const id=m.dataset.mark; done[id]=!done[id]; if(!done[id]) delete done[id]; save();
+    m.classList.toggle("done",!!done[id]); m.textContent=done[id]?"✓ Done (click to undo)":"Mark as done";
+    const s=document.querySelector(`[data-state="${id}"]`); if(s){ s.classList.toggle("done",!!done[id]); s.innerHTML=(done[id]?"Done":"Not started")+' <span class="chev" aria-hidden="true">›</span>'; }
+    progress(); }
+});
+
+document.getElementById("q").addEventListener("input",e=>{
+  const q=e.target.value.trim().toLowerCase(); const box=document.getElementById("searchResults");
+  if(q.length<2){ box.innerHTML=""; return; }
+  const hits=ALL.filter(x=>x.l.slice(0,6).flat().join(" ").replace(/<[^>]+>/g,"").toLowerCase().includes(q)).slice(0,10);
+  box.innerHTML = hits.length? hits.map(x=>`<a href="#${x.t.id}" data-open="${x.id}">${x.l[0]}<small>${x.t.name} · ${x.level[0].toUpperCase()+x.level.slice(1)}</small></a>`).join("") : `<p style="color:var(--muted)">No lesson matches “${e.target.value}”. Try a shorter word, or check the Glossary.</p>`;
+});
+
+nav(); trackViews(); extras(); progress(); route();
+const first = document.querySelector("#v-foundations details.lesson"); if(first) first.open=true;
+TRACKS.forEach(t=>{ const f=document.querySelector(`#v-${t.id} details.lesson`); if(f) f.open=true; });
+</script>
+</body>
+</html>
